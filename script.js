@@ -35,8 +35,7 @@ function tone(freq, dur = 0.055, vol = 0.045) {
   o.stop(audio.currentTime + dur);
 }
 function startGame() {
-  if (!audio)
-    audio = new (window.AudioContext || window.webkitAudioContext)();
+  if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
   audio.resume();
   combo = 0;
   lastHit = "";
@@ -173,10 +172,6 @@ function draw() {
   context.fillStyle = "#d4a58b";
   context.fillText("SOLeÁ", center.x, center.y + 18);
 
-  // target guide
-  context.font = "16px system-ui";
-  context.fillStyle = "#d9b09a";
-  context.fillText("強拍： 3   5   7   10", center.x, 365);
   context.font = "15px system-ui";
   context.fillStyle = lastHit === "MISS" ? "#ff806d" : "#f2c8a9";
   context.fillText(lastHit, center.x, 400);
@@ -203,8 +198,7 @@ function loop(t) {
     const current = Math.floor(elapsed / beatMs);
 
     while (nextBeat <= t) {
-      const beatNumber =
-        (Math.floor((nextBeat - startedAt) / beatMs) % 12) + 1;
+      const beatNumber = (Math.floor((nextBeat - startedAt) / beatMs) % 12) + 1;
       pulse(beatNumber);
       nextBeat += beatMs;
     }
