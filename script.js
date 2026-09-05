@@ -83,7 +83,7 @@ function tap() {
     score += pts;
     combo++;
     best = Math.max(best, combo);
-    lastHit = diff < 0.08 ? "PERFECT!" : diff < 0.17 ? "GREAT" : "GOOD";
+    lastHit = diff < 0.12 ? "PERFECT!" : "GOOD";
     flash = strong ? 1 : 0.6;
   } else {
     combo = 0;
