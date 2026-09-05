@@ -12,8 +12,7 @@ let running = false,
   score = 0,
   combo = 0,
   best = 0,
-  lastHit = "",
-  flash = 0;
+  lastHit = "";
 let bpm = 110,
   nextBeat = 0,
   beatMs = 60000 / bpm,
@@ -42,7 +41,6 @@ function startGame() {
   score = 0;
   combo = 0;
   lastHit = "";
-  flash = 0;
   beat = 1;
   startedAt = performance.now();
   nextBeat = startedAt;
@@ -55,7 +53,6 @@ function reset() {
   best = 0;
   lastHit = "";
   beat = 0;
-  flash = 0;
   draw();
 }
 function currentBeat() {
@@ -66,7 +63,6 @@ function pulse(b) {
   // 12,3,6,8,10 are accented in the exercise
   const strong = target.includes(b);
   tone(strong ? 180 : 310, strong ? 0.12 : 0.045, strong ? 0.11 : 0.045);
-  if (strong) flash = 1;
 }
 function tap() {
   if (!running) return;
@@ -84,11 +80,9 @@ function tap() {
     combo++;
     best = Math.max(best, combo);
     lastHit = diff < 0.12 ? "PERFECT!" : "GOOD";
-    flash = strong ? 1 : 0.6;
   } else {
     combo = 0;
     lastHit = "MISS";
-    flash = 0.25;
   }
 }
 window.addEventListener("keydown", (e) => {
@@ -217,7 +211,6 @@ function loop(t) {
     }
 
     beat = (current % 12) + 1;
-    if (flash > 0) flash *= 0.86;
   }
   draw();
   requestAnimationFrame(loop);
