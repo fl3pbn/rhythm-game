@@ -6,12 +6,12 @@ const canvas = document.getElementById("game"),
   H = 430;
 canvas.height = H;
 const target = [3, 6, 8, 10, 12];
+const BEST_KEY = "compasBest";
 let running = false,
   showNumbers = true,
   beat = 0,
-  score = 0,
   combo = 0,
-  best = 0,
+  best = Number(localStorage.getItem(BEST_KEY)) || 0,
   lastHit = "";
 let bpm = 110,
   nextBeat = 0,
@@ -38,7 +38,6 @@ function startGame() {
   if (!audio)
     audio = new (window.AudioContext || window.webkitAudioContext)();
   audio.resume();
-  score = 0;
   combo = 0;
   lastHit = "";
   beat = 1;
@@ -48,9 +47,9 @@ function startGame() {
 }
 function reset() {
   running = false;
-  score = 0;
   combo = 0;
   best = 0;
+  localStorage.setItem(BEST_KEY, "0");
   lastHit = "";
   beat = 0;
   draw();
@@ -70,15 +69,13 @@ function tap() {
   const pos = (now - startedAt) / beatMs;
   const nearest = Math.round(pos);
   const diff = Math.abs(pos - nearest);
-  // Beat 1 starts at game start.
-  const b = (((nearest % 12) + 12) % 12) + 1;
   const tolerance = 0.25;
   if (diff <= tolerance) {
-    const strong = target.includes(b);
-    const pts = strong ? 100 : 30;
-    score += pts;
     combo++;
-    best = Math.max(best, combo);
+    if (combo > best) {
+      best = combo;
+      localStorage.setItem(BEST_KEY, String(best));
+    }
     lastHit = diff < 0.12 ? "PERFECT!" : "GOOD";
   } else {
     combo = 0;
@@ -118,9 +115,11 @@ function draw() {
   // header
   context.fillStyle = "#fff";
   context.font = "bold 20px system-ui";
-  context.fillText("SCORE " + String(score).padStart(5, "0"), 24, 32);
-  context.fillText("COMBO ×" + combo, 300, 32);
-  context.fillText("BEST ×" + best, 590, 32);
+  context.textBaseline = "alphabetic";
+  context.textAlign = "center";
+  context.fillText("COMBO ×" + combo, W / 2, 32);
+  context.textAlign = "right";
+  context.fillText("BEST ×" + best, W - 24, 32);
 
   // rings
   context.strokeStyle = "#57372b";
