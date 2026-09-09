@@ -181,14 +181,10 @@ function draw() {
     context.fillRect(0, 45, W, 340);
     context.fillStyle = "#fff";
     context.font = "bold 34px system-ui";
-    context.fillText("12拍のコンパスを練習しよう", center.x, 125);
-    context.font = "19px system-ui";
-    context.fillStyle = "#e0bba5";
-    context.fillText("12・3・6・8・10 の強拍を狙って", center.x, 165);
-    context.fillText("Space または画面クリック！", center.x, 195);
+    context.fillText("12拍のコンパスを練習しよう", center.x, 190);
     context.font = "bold 24px system-ui";
     context.fillStyle = "#f0a56d";
-    context.fillText("▶ スタートを押して開始", center.x, 245);
+    context.fillText("▶ スタートを押して開始", center.x, 240);
   }
 }
 
