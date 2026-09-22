@@ -1,14 +1,20 @@
 "use strict";
 
+// canvasタグの要素を取得
 const canvas = document.getElementById("game"),
+  // <canvas> に対してgetContext() を呼び出し,二次元描画コンテキストを取得
   context = canvas.getContext("2d"),
+  // カンマで区切ると、複数の変数をまとめて宣言できる
   W = canvas.width,
+  // canvas.heightから読み取ってもよいが、下記の円の位置(center)・半径(R)がこの430前提の座標なので、
+  // 念のため直接ハードコーディングしている
   H = 430;
 canvas.height = H;
+
 const target = [3, 6, 8, 10, 12];
 const BEST_KEY = "compasBest";
 let running = false,
-  showNumbers = true,
+  showNumbers = false,
   beat = 0,
   combo = 0,
   best = Number(localStorage.getItem(BEST_KEY)) || 0,
@@ -17,10 +23,15 @@ let bpm = 110,
   nextBeat = 0,
   beatMs = 60000 / bpm,
   startedAt = 0,
+  pulseCount = 0,
   audio = null;
+// 430➗2=215 canvas.heightから読み取って割る２してもよいところだが、
+// 円の位置(center)・半径(R)が430px前提の座標なので、うっかり変えないように固定値215としている
 const center = { x: W / 2, y: 215 },
+  // 基準円の半径 145px と決め打ちしている。html側と干渉しにくいために。
   R = 145;
 
+// ボン、チッチッチ、の音設定
 function tone(freq, dur = 0.055, vol = 0.045) {
   if (!audio) return;
   const o = audio.createOscillator(),
@@ -42,6 +53,7 @@ function startGame() {
   beat = 1;
   startedAt = performance.now();
   nextBeat = startedAt;
+  pulseCount = 0;
   running = true;
 }
 function reset() {
@@ -60,7 +72,7 @@ function currentBeat() {
 function pulse(b) {
   // 12,3,6,8,10 are accented in the exercise
   const strong = target.includes(b);
-  tone(strong ? 180 : 310, strong ? 0.12 : 0.045, strong ? 0.11 : 0.045);
+  tone(strong ? 180 : 310, strong ? 0.18 : 0.045, strong ? 0.16 : 0.03);
 }
 function tap() {
   if (!running) return;
@@ -95,6 +107,7 @@ window.addEventListener("keydown", (e) => {
 });
 canvas.addEventListener("pointerdown", tap);
 document.getElementById("start").onclick = () => {
+  if (running) return;
   startGame();
   document.getElementById("start").textContent = "▶ プレイ中";
 };
@@ -106,31 +119,44 @@ document.getElementById("mode").onclick = () => {
   draw();
 };
 
+// canvas描画コード ---------------------------------
 function draw() {
+  // ゲームエリアの色を、一旦透明にクリア
   context.clearRect(0, 0, W, H);
+  // 色は焦茶色とする
   context.fillStyle = "#100a09";
+  // その色で、塗りつぶす。よくある「消してから塗る」という定型パターン
   context.fillRect(0, 0, W, H);
 
   // header
+  // combo, bestの文字色
   context.fillStyle = "#fff";
   context.font = "bold 20px system-ui";
   context.textBaseline = "alphabetic";
   context.textAlign = "center";
-  context.fillText("COMBO ×" + combo, W / 2, 32);
+  context.fillText("COMBO × " + combo, W / 2, 32);
   context.textAlign = "right";
-  context.fillText("BEST ×" + best, W - 24, 32);
+  context.fillText("BEST × " + best, W - 24, 32);
 
   // rings
+  // ① 「線の色は茶色」という設定
   context.strokeStyle = "#57372b";
+  // ② 「線の太さは2px」という設定
   context.lineWidth = 2;
+  // ③ 「新しい図形の設計図を始めます」
   context.beginPath();
+  // ④ 「中心(center)・半径(R+22)の円を、この設計図に追加」
+  // 単位がラジアン。第五引数:360度としたい ＝ 2π ラジアン（約6.28ラジアン）
   context.arc(center.x, center.y, R + 22, 0, Math.PI * 2);
+  // ⑤ 「①②の設定を使って、④の設計図の輪郭線を実際に描画する」
   context.stroke();
+  // 2つ目。内側の円
   context.strokeStyle = "#2c1c17";
   context.beginPath();
   context.arc(center.x, center.y, R - 24, 0, Math.PI * 2);
   context.stroke();
 
+  // ここから構造理解中⭐️⭐️drawの中。描き中。
   const active = currentBeat();
   for (let b = 1; b <= 12; b++) {
     const a = -Math.PI / 2 + (b * Math.PI * 2) / 12;
@@ -194,9 +220,10 @@ function loop(t) {
     const current = Math.floor(elapsed / beatMs);
 
     while (nextBeat <= t) {
-      const beatNumber = (Math.floor((nextBeat - startedAt) / beatMs) % 12) + 1;
+      const beatNumber = (pulseCount % 12) + 1;
       pulse(beatNumber);
-      nextBeat += beatMs;
+      pulseCount++;
+      nextBeat = startedAt + pulseCount * beatMs;
     }
 
     beat = (current % 12) + 1;

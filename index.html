@@ -9,16 +9,17 @@
   <body>
     <div id="app">
       <h1>💃 COMPÁS FLAMENCO</h1>
-      <p class="sub">SOLEÁ — 12拍のコンパスを感じよう</p>
+      <!-- <p class="sub">SOLEÁ — ソレア</p> -->
+      <!-- heightは430以外に変えないこと。script.js側で円の位置、半径をこの430前提で計算している -->
       <canvas id="game" width="760" height="430"></canvas>
       <div class="controls">
         <button id="start">▶ スタート</button>
-        <button id="mode">数字表示：ON</button>
+        <button id="mode">数字表示：OFF</button>
         <button id="reset">↺ リセット</button>
       </div>
       <div class="help">
-        画面の <b>「12・3・6・8・10」</b> に合わせて
-        <b>Space</b> または画面クリック！
+        画面の <b>「3・6・8・10・12」</b> に合わせて
+        <b>Spaceキー</b> または画面タップ！
       </div>
     </div>
     <script src="script.js"></script>
